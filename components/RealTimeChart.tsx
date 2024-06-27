@@ -206,33 +206,34 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
       console.log(priceOracle.timestamp.toString())
       console.log(`Timestamp (local date): ${formattedDate}`);
 
-      const newTimestamp = Number(priceOracle.timestamp.toString()) * 1000;
-      const newDataPoint = { x: newTimestamp, y: Number(priceOracle.toUiPrice(2)) };
 
-      let dt: any
 
-      if (series.length==0) {
-        const locSeries = await getInitialSeries()
-        dt = [...locSeries[0]?.data]
+
+      let locDt;
+      if(!series.length){
+        const seriesLoc:TSeries = await getInitialSeries()
+        locDt=seriesLoc[0]?.data
+      }else{
+        locDt= series[0]?.data
       }
-      else {
-        dt = [...series[0]?.data]; // Ensure series[0]?.data is not undefined or null
+      let dt = [...locDt];
+      dt.forEach((x) => x.x--);
+      dt.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(2)) });
+      // 차트 포인트 없애기 위해 조기화
+      //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
+      //dt[0].y = 0;
+      console.log(dt.length);
+
+      setSeries([{ data: [...dt] }]);
 
 
-      }
 
-      // if (dt) {
-      //     dt = [...dt]; // Spread into a new array if dt is defined
-          dt.forEach((x) => x.x--); // Modify each element as needed
-      // }
+
 
       // Check if the timestamp already exists
-      // const timestampExists = dt.some(data => data.x === newTimestamp);
 
-      // if (!timestampExists) {
-      dt.push(newDataPoint);
       console.log(series)
-      // }
+
       // 차트 포인트 없애기 위해 조기화
       //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
       //dt[0].y = 0;
@@ -251,7 +252,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const len = series[0].data.length;
+      const len = series[0]?.data.length ?? 0 // ;
       if (len > seriesCount * 2) {
 
         //1
@@ -304,7 +305,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
 
 
 
-  return <ReactApexChart options={options} series={series} type="area" />;
+  return <ReactApexChart options={options} series={series} type="line" />;
 }
 
 export default function RealTimeChartTest() {
