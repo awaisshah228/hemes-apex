@@ -111,25 +111,25 @@ const apexOptions: ApexOptions = {
 type TSeriesData = { x: number; y: number | null }[];
 type TSeries = { data: TSeriesData }[];
 
-const getInitialSeries = async() => {
+const getInitialSeries = async () => {
   const series: TSeriesData = [];
 
-     const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
-     if(!priceUpdates?.length){
-      // series.push({ x: new Date().getTime(), y: null});
+  const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
+  if (!priceUpdates?.length) {
+    // series.push({ x: new Date().getTime(), y: null});
 
-      return [{ data: series }]
-     }
-    const priceFeed: PriceFeed = priceUpdates[0]
-    const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-    const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
+    return [{ data: series }]
+  }
+  const priceFeed: PriceFeed = priceUpdates[0]
+  const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
+  const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
 
-    const priceOracle = new OraclePrice({
-      price: new BN(uncheckedPrice.price),
-      exponent: new BN(uncheckedPrice.expo),
-      confidence: new BN(uncheckedPrice.conf),
-      timestamp: new BN(uncheckedPrice.publishTime),
-    })
+  const priceOracle = new OraclePrice({
+    price: new BN(uncheckedPrice.price),
+    exponent: new BN(uncheckedPrice.expo),
+    confidence: new BN(uncheckedPrice.conf),
+    timestamp: new BN(uncheckedPrice.publishTime),
+  })
 
   // let init: number[];
   // if (initValues.length > seriesCount) {
@@ -142,7 +142,7 @@ const getInitialSeries = async() => {
   // const start = seriesCount - init.length;
   // for (let i = 1; i <= seriesCount; i++) {
   //   const diff = i - start - 1;
-    series.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(4)) });
+  series.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(2)) });
   // }
   return [{ data: series }];
 };
@@ -153,23 +153,20 @@ type Props = {
 };
 
 export function RealTimeChart({ initValues, valueRef }: Props) {
-  const [series, setSeries] = useState<TSeries>([{data:[{
-    x:new Date().getTime(),
-    y:null
-  }]}]);
+  const [series, setSeries] = useState<TSeries>([]);
   //const [series, setSeries] = useState<TSeries>([{ name: 'test', data: [] }]);
   const [options, setOptions] = useState<ApexOptions>(() => apexOptions);
   const needAdd = useRef(false);
   const needSlice = useRef(false);
 
-  useEffect(()=>{
-  (async()=>{
-    const data= await  getInitialSeries()
-    setSeries(data)
+  // useEffect(() => {
+  //   (async () => {
+  //     const data = await getInitialSeries()
+  //     setSeries(data)
 
-  }
-  )()
-  },[])
+  //   }
+  //   )()
+  // }, [])
 
   const setAnimation = useCallback<(value: boolean) => void>(
     (value) => {
@@ -187,49 +184,69 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
 
   const addData = useCallback(async (priceFeed: PriceFeed) => {
 
+
+    try {
+      const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
+      const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
+
+      const priceOracle = new OraclePrice({
+        price: new BN(uncheckedPrice.price),
+        exponent: new BN(uncheckedPrice.expo),
+        confidence: new BN(uncheckedPrice.conf),
+        timestamp: new BN(uncheckedPrice.publishTime),
+      })
+
+
+      const localDate = new Date(priceOracle.timestamp.toString() * 1000); // Convert seconds to milliseconds
+
+      // Format the date to a readable string
+      const formattedDate = localDate.toLocaleString();
+
+      console.log(priceOracle.toUiPrice(2));
+      console.log(priceOracle.timestamp.toString())
+      console.log(`Timestamp (local date): ${formattedDate}`);
+
+      const newTimestamp = Number(priceOracle.timestamp.toString()) * 1000;
+      const newDataPoint = { x: newTimestamp, y: Number(priceOracle.toUiPrice(2)) };
+
+      let dt: any
+
+      if (!series.length) {
+        const locSeries = await getInitialSeries()
+        dt = [...locSeries[0]?.data]
+      }
+      else {
+        dt = [...series[0]?.data]; // Ensure series[0]?.data is not undefined or null
+
+
+      }
+
+      // if (dt) {
+      //     dt = [...dt]; // Spread into a new array if dt is defined
+          dt.forEach((x) => x.x--); // Modify each element as needed
+      // }
+
+      // Check if the timestamp already exists
+      // const timestampExists = dt.some(data => data.x === newTimestamp);
+
+      // if (!timestampExists) {
+      dt.push(newDataPoint);
+      console.log(series)
+      // }
+      // 차트 포인트 없애기 위해 조기화
+      //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
+      //dt[0].y = 0;
+      console.log(dt.length);
+
+      setSeries([{ data: [...dt] }]);
+
+    } catch (error) {
+      console.log(error)
+    }
+
     // const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
     // const priceFeed: PriceFeed = priceUpdates[0]
-    const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-    const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
 
-    const priceOracle = new OraclePrice({
-      price: new BN(uncheckedPrice.price),
-      exponent: new BN(uncheckedPrice.expo),
-      confidence: new BN(uncheckedPrice.conf),
-      timestamp: new BN(uncheckedPrice.publishTime),
-    })
-    
-
-    const localDate = new Date(priceOracle.timestamp.toString() * 1000); // Convert seconds to milliseconds
-
-    // Format the date to a readable string
-    const formattedDate = localDate.toLocaleString();
-
-    console.log(priceOracle.toUiPrice(2));
-    console.log(priceOracle.timestamp.toString())
-    console.log(`Timestamp (local date): ${formattedDate}`);
-    
-    const newTimestamp = Number(priceOracle.timestamp.toString()) * 1000;
-    const newDataPoint = { x: newTimestamp, y: Number(priceOracle.toUiPrice(4)) };
-
-    let dt = series[0]?.data; // Ensure series[0]?.data is not undefined or null
-if (dt) {
-    dt = [...dt]; // Spread into a new array if dt is defined
-    dt.forEach((x) => x.x--); // Modify each element as needed
-}
-    
-    // Check if the timestamp already exists
-    // const timestampExists = dt.some(data => data.x === newTimestamp);
-    
-    // if (!timestampExists) {
-      dt.push(newDataPoint);
-    // }
-    // 차트 포인트 없애기 위해 조기화
-    //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
-    //dt[0].y = 0;
-    console.log(dt.length);
-
-    setSeries([{ data: [...dt] }]);
   }, [series, valueRef]);
 
   useEffect(() => {
@@ -285,7 +302,7 @@ if (dt) {
     })
   }, [])
 
-  
+
 
   return <ReactApexChart options={options} series={series} type="area" />;
 }
