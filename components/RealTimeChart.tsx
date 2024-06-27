@@ -207,7 +207,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
     console.log(`Timestamp (local date): ${formattedDate}`);
     const newTimestamp = Number(priceOracle.timestamp.toString()) * 1000;
     const newDataPoint = { x: newTimestamp, y: Number(priceOracle.toUiPrice(4)) };
-    let dt = series[0]?.data; // Ensure series[0]?.data is not undefined or null
+    let dt = series[0]?.data ?? []; // Ensure series[0]?.data is not undefined or null
 if (dt) {
     dt = [...dt]; // Spread into a new array if dt is defined
     dt.forEach((x) => x.x--); // Modify each element as needed
