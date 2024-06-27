@@ -152,7 +152,7 @@ type Props = {
   valueRef: MutableRefObject<number | null>;
 };
 
-export function RealTimeChart({ initValues, valueRef }: Props) {
+export function RealTimeChart() {
   const [series, setSeries] = useState<TSeries>([]);
   //const [series, setSeries] = useState<TSeries>([{ name: 'test', data: [] }]);
   const [options, setOptions] = useState<ApexOptions>(() => apexOptions);
@@ -217,12 +217,12 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
         locDt= series[0]?.data
       }
       let dt = [...locDt];
-      dt.forEach((x) => x.x--);
+      // dt.forEach((x) => x.x--);
       dt.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(2)) });
       // 차트 포인트 없애기 위해 조기화
       //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
       //dt[0].y = 0;
-      console.log(dt.length);
+      // console.log(dt.length);
 
       setSeries([{ data: [...dt] }]);
 
@@ -248,7 +248,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
     // const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
     // const priceFeed: PriceFeed = priceUpdates[0]
 
-  }, [series, valueRef]);
+  }, [series]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -311,22 +311,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
 export default function RealTimeChartTest() {
   //const initValues = [50, 50, 50, 10];
   //const lastValue = 50;
-  const initValues: number[] = [];
-  const lastValue = null;
-  const [value, setValue] = useState<number | null>(lastValue);
-  const valueRef = useRef<number | null>(lastValue);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const v = Math.random() * (80 - 40) + 40;
-      setValue(v);
-    }, 1200);
-    return () => clearInterval(timer);
-  }, [value]);
 
-  useEffect(() => {
-    valueRef.current = value;
-  }, [value]);
-
-  return <RealTimeChart initValues={initValues} valueRef={valueRef} />;
+  return <RealTimeChart  />;
 }
