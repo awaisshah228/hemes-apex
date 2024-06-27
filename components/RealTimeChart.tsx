@@ -10,8 +10,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import ReactApexChart from 'react-apexcharts'; 4
 const hermesUrl = 'https://hermes.pyth.network'
+
+import dynamic from "next/dynamic";
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 
 const priceIds = [
@@ -109,20 +111,25 @@ const apexOptions: ApexOptions = {
 type TSeriesData = { x: number; y: number | null }[];
 type TSeries = { data: TSeriesData }[];
 
-const getInitialSeries = async() => {
+const getInitialSeries = async () => {
   const series: TSeriesData = [];
 
-     const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
-    const priceFeed: PriceFeed = priceUpdates[0]
-    const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-    const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
+  const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
+  if (!priceUpdates?.length) {
+    series.push({ x: new Date().getTime(), y: null });
 
-    const priceOracle = new OraclePrice({
-      price: new BN(uncheckedPrice.price),
-      exponent: new BN(uncheckedPrice.expo),
-      confidence: new BN(uncheckedPrice.conf),
-      timestamp: new BN(uncheckedPrice.publishTime),
-    })
+    return [{ data: series }]
+  }
+  const priceFeed: PriceFeed = priceUpdates[0]
+  const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
+  const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
+
+  const priceOracle = new OraclePrice({
+    price: new BN(uncheckedPrice.price),
+    exponent: new BN(uncheckedPrice.expo),
+    confidence: new BN(uncheckedPrice.conf),
+    timestamp: new BN(uncheckedPrice.publishTime),
+  })
 
   // let init: number[];
   // if (initValues.length > seriesCount) {
@@ -135,7 +142,7 @@ const getInitialSeries = async() => {
   // const start = seriesCount - init.length;
   // for (let i = 1; i <= seriesCount; i++) {
   //   const diff = i - start - 1;
-    series.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(4)) });
+  series.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(4)) });
   // }
   return [{ data: series }];
 };
@@ -188,7 +195,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
       confidence: new BN(uncheckedPrice.conf),
       timestamp: new BN(uncheckedPrice.publishTime),
     })
-    
+
 
     const localDate = new Date(priceOracle.timestamp.toString() * 1000); // Convert seconds to milliseconds
 
@@ -198,22 +205,30 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
     console.log(priceOracle.toUiPrice(2));
     console.log(priceOracle.timestamp.toString())
     console.log(`Timestamp (local date): ${formattedDate}`);
-    let dt = [...series[0].data];
-    dt.forEach((x) => x.x--);
-
     const newTimestamp = Number(priceOracle.timestamp.toString()) * 1000;
     const newDataPoint = { x: newTimestamp, y: Number(priceOracle.toUiPrice(4)) };
-    
+    let dt = series[0]?.data; // Ensure series[0]?.data is not undefined or null
+if (dt) {
+    dt = [...dt]; // Spread into a new array if dt is defined
+    dt.forEach((x) => x.x--); // Modify each element as needed
+}
+
+
     // Check if the timestamp already exists
     // const timestampExists = dt.some(data => data.x === newTimestamp);
-    
+
     // if (!timestampExists) {
-      dt.push(newDataPoint);
+    dt.push(newDataPoint);
     // }
     // 차트 포인트 없애기 위해 조기화
     //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
     //dt[0].y = 0;
     console.log(dt.length);
+
+
+
+
+
 
     setSeries([{ data: [...dt] }]);
   }, [series, valueRef]);
@@ -271,34 +286,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
     })
   }, [])
 
-  useEffect(() => {
 
-    (async () => {
-      const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
-      const priceFeed: PriceFeed = priceUpdates[0]
-      const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-      const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
-
-      const priceOracle = new OraclePrice({
-        price: new BN(uncheckedPrice.price),
-        exponent: new BN(uncheckedPrice.expo),
-        confidence: new BN(uncheckedPrice.conf),
-        timestamp: new BN(uncheckedPrice.publishTime),
-      })
-     
-
-      const localDate = new Date(priceOracle.timestamp.toString() * 1000); // Convert seconds to milliseconds
-
-      // Format the date to a readable string
-      const formattedDate = localDate.toLocaleString();
-
-      console.log(priceOracle.toUiPrice(4));
-      console.log(priceOracle.timestamp.toString())
-      console.log(`Timestamp (local date): ${formattedDate}`);
-
-    })()
-
-  }, [])
 
   return <ReactApexChart options={options} series={series} type="area" />;
 }
