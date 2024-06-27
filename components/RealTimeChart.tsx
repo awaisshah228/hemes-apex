@@ -211,7 +211,7 @@ export function RealTimeChart({ initValues, valueRef }: Props) {
 
       let dt: any
 
-      if (!series.length) {
+      if (series.length==0) {
         const locSeries = await getInitialSeries()
         dt = [...locSeries[0]?.data]
       }
