@@ -84,6 +84,8 @@ const apexOptions: ApexOptions = {
   },
   xaxis: {
     type: 'datetime',
+    offsetX:50,
+    stepSize:10
     // labels: {
     //   format: 'HH:mm', // Change this format as needed
     // }
@@ -250,45 +252,45 @@ export function RealTimeChart() {
 
   }, [series]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const len = series[0]?.data.length ?? 0 // ;
-      if (len > seriesCount * 2) {
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     const len = series[0]?.data.length ?? 0 // ;
+  //     if (len > seriesCount * 2) {
 
-        //1
-        // The data to be added this time will be added after the data has been cut. -> 4 times
-        needSlice.current = true;
-        setAnimation(false);
-      }
-    }, 1000);
+  //       //1
+  //       // The data to be added this time will be added after the data has been cut. -> 4 times
+  //       needSlice.current = true;
+  //       setAnimation(false);
+  //     }
+  //   }, 1000);
 
-    return () => clearInterval(timer);
-  }, [addData, series, setAnimation]);
+  //   return () => clearInterval(timer);
+  // }, [addData, series, setAnimation]);
 
-  useEffect(() => {
-    const aniEnable = options.chart?.animations?.enabled;
+  // useEffect(() => {
+  //   const aniEnable = options.chart?.animations?.enabled;
 
-    if (!aniEnable) {
-      if (needSlice.current) {
-        needSlice.current = false;
+  //   if (!aniEnable) {
+  //     if (needSlice.current) {
+  //       needSlice.current = false;
 
-        let dt = [...series[0].data];
-        // 2. The data is cut when the animation is stopped.
-        dt = dt.slice(seriesCount, dt.length);
-        const newSeries = { ...series[0], data: dt };
-        setSeries([newSeries]);
-      } else {
-        //  3. After the animation was stopped, the data was cut and updated with the series.
-        // Set the flag to replay the animation again and save the previously unsaved data
-        needAdd.current = true;
-        setAnimation(true);
-      }
-    } else {
-      //// 4. Add the data that you didn't want to add to the series.
+  //       let dt = [...series[0].data];
+  //       // 2. The data is cut when the animation is stopped.
+  //       dt = dt.slice(seriesCount, dt.length);
+  //       const newSeries = { ...series[0], data: dt };
+  //       setSeries([newSeries]);
+  //     } else {
+  //       //  3. After the animation was stopped, the data was cut and updated with the series.
+  //       // Set the flag to replay the animation again and save the previously unsaved data
+  //       needAdd.current = true;
+  //       setAnimation(true);
+  //     }
+  //   } else {
+  //     //// 4. Add the data that you didn't want to add to the series.
 
 
-    }
-  }, [addData, options.chart?.animations?.enabled, series, setAnimation]);
+  //   }
+  // }, [addData, options.chart?.animations?.enabled, series, setAnimation]);
 
   useEffect(() => {
 
@@ -309,8 +311,6 @@ export function RealTimeChart() {
 }
 
 export default function RealTimeChartTest() {
-  //const initValues = [50, 50, 50, 10];
-  //const lastValue = 50;
 
 
   return <RealTimeChart  />;
