@@ -84,7 +84,6 @@ const apexOptions: ApexOptions = {
   },
   xaxis: {
     type: 'datetime',
-    min:new Date().getTime()-60000,
     labels: {
       // datetimeUTC: false,
       // formatter: function (val) {
