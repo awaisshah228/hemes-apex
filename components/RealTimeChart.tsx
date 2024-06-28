@@ -84,16 +84,19 @@ const apexOptions: ApexOptions = {
   },
   xaxis: {
     type: 'datetime',
-    offsetX:50,
-    stepSize:10
-    // labels: {
-    //   format: 'HH:mm', // Change this format as needed
-    // }
-    // tickAmount: 6,
-    // range: seriesCount,
-    // labels: {
-    //   formatter: (val) => (seriesCount - Number(val)).toFixed(0) + 'X',
-    // },
+    labels: {
+      datetimeUTC: false,
+      formatter: function (val) {
+        return new Date(val).toLocaleTimeString('en-US', {
+          minute: '2-digit',
+          second: '2-digit',
+        });
+      },
+      datetimeFormatter: {
+        minute: 'HH:mm',
+        // hour:'HH'
+      },
+    },
   },
   yaxis: {
     min: 0,
@@ -241,7 +244,6 @@ export function RealTimeChart() {
       //dt[0].y = 0;
       console.log(dt.length);
 
-      setSeries([{ data: [...dt] }]);
 
     } catch (error) {
       console.log(error)
