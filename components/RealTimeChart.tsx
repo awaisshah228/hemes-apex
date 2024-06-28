@@ -48,7 +48,7 @@ const apexOptions: ApexOptions = {
       },
     },
     toolbar: {
-      show: false,
+      show: true,
     },
   },
   annotations: {
@@ -67,15 +67,15 @@ const apexOptions: ApexOptions = {
       },
     ],
   },
-  tooltip: {
-    enabled: false,
-    x:{
-      show: true
-    },
-    onDatasetHover:{
-      highlightDataSeries: true
-    }
-  },
+  // tooltip: {
+  //   enabled: false,
+  //   // x:{
+  //   //   show: true
+  //   // },
+  //   onDatasetHover:{
+  //     highlightDataSeries: true
+  //   }
+  // },
   dataLabels: {
     enabled: true,
   },
