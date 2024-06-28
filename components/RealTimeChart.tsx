@@ -68,10 +68,13 @@ const apexOptions: ApexOptions = {
     ],
   },
   tooltip: {
-    enabled: false,
+    enabled: true,
+    x:{
+      show: true
+    }
   },
   dataLabels: {
-    enabled: false,
+    enabled: true,
   },
   stroke: {
     curve: 'straight',
