@@ -15,7 +15,7 @@ type Store = {
 }
 
 const usePriceDataStore = create<Store>()((set) => ({
-  data: [[Date.now()-10000, 145]],
+  data: [[Date.now()-10000, null]],
   append: (dataPoint: number[]) => set((state) => {
     // only have the last 100 items in the list
     return ({ data: [...state.data, dataPoint].slice(-100) })
@@ -23,7 +23,7 @@ const usePriceDataStore = create<Store>()((set) => ({
 }))
 
 const usePositiveConfidenceDataStore = create<Store>()((set) => ({
-  data: [[Date.now()-10000, 145]],
+  data: [[Date.now()-10000, null]],
   append: (dataPoint: number[]) => set((state) => {
     // only have the last 100 items in the list
     return ({ data: [...state.data, dataPoint].slice(-100) })
@@ -31,7 +31,7 @@ const usePositiveConfidenceDataStore = create<Store>()((set) => ({
 }))
 
 const useNegetiveConfidenceDataStore = create<Store>()((set) => ({
-  data: [[Date.now()-10000, 145]],
+  data: [[Date.now()-10000, null]],
   append: (dataPoint: number[]) => set((state) => {
     // only have the last 100 items in the list
     return ({ data: [...state.data, dataPoint].slice(-100) })
