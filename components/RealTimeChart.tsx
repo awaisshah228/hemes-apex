@@ -115,64 +115,18 @@ const apexOptions: ApexOptions = {
 type TSeriesData = { x: number; y: number | null }[];
 type TSeries = { data: TSeriesData }[];
 
-const getInitialSeries = async () => {
-  const series: TSeriesData = [];
 
-  const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
-  if (!priceUpdates?.length) {
-    // series.push({ x: new Date().getTime(), y: null});
 
-    return [{ data: series }]
-  }
-  const priceFeed: PriceFeed = priceUpdates[0]
-  const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-  const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
 
-  const priceOracle = new OraclePrice({
-    price: new BN(uncheckedPrice.price),
-    exponent: new BN(uncheckedPrice.expo),
-    confidence: new BN(uncheckedPrice.conf),
-    timestamp: new BN(uncheckedPrice.publishTime),
-  })
-
-  // let init: number[];
-  // if (initValues.length > seriesCount) {
-  //   const len = initValues.length;
-  //   init = initValues.slice(len - seriesCount, len);
-  // } else {
-  //   init = initValues;
-  // }
-
-  // const start = seriesCount - init.length;
-  // for (let i = 1; i <= seriesCount; i++) {
-  //   const diff = i - start - 1;
-  series.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(2)) });
-  // }
-  return [{ data: series }];
-};
-
-type Props = {
-  initValues: number[];
-  valueRef: MutableRefObject<number | null>;
-};
 
 export function RealTimeChart() {
   const [series, setSeries] = useState<TSeries>([]);
-  //const [series, setSeries] = useState<TSeries>([{ name: 'test', data: [] }]);
   const [options, setOptions] = useState<ApexOptions>(() => apexOptions);
- 
-
- 
-
- 
-  // const [data,setData]=useState<any[]>([])
-
   const addData = async (priceFeed: PriceFeed) => {
 
 
     try {
       const uncheckedPrice: Price = priceFeed.getPriceUnchecked();
-      const uncheckedEmaPrice: Price = priceFeed.getEmaPriceUnchecked();
 
       const priceOracle = new OraclePrice({
         price: new BN(uncheckedPrice.price),
@@ -188,27 +142,11 @@ export function RealTimeChart() {
         x: Number(priceOracle.timestamp.toString()) * 1000,
         y: Number(priceOracle.toUiPrice(2)),
       };
-  
-      // Use functional update to ensure we work with the latest state
-      // setData((prevData) => {
-      //   const newData = [...prevData, dataPt];
-      //   // Ensure the data array does not exceed 60 items
-      //   if (newData.length > seriesCount) {
-      //     newData.shift(); // Remove the oldest item
-      //   }
-      //   return newData;
-      // });
 
-      // Format the date to a readable string
       const formattedDate = localDate.toLocaleString();
-
       console.log(priceOracle.toUiPrice(2));
       console.log(priceOracle.timestamp.toString())
       console.log(`Timestamp (local date): ${formattedDate}`);
-
-
-
-
       setSeries((prevSeries) => {
         const newData = [...(prevSeries[0]?.data || []), dataPt];
         // Ensure the series data array does not exceed 60 items
@@ -218,41 +156,15 @@ export function RealTimeChart() {
         return [{ data: newData }];
       });
 
-
-
-
-
-      // Check if the timestamp already exists
-
-
-      // 차트 포인트 없애기 위해 조기화
-      //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
-      //dt[0].y = 0;
-
-
     } catch (error) {
       console.log(error)
     }
 
-    // const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
-    // const priceFeed: PriceFeed = priceUpdates[0]
-
   };
 
-  
-
- 
-
   useEffect(() => {
-
-
     pythPriceServiceConnection.subscribePriceFeedUpdates(priceIds, (priceFeed: PriceFeed) => {
-
-
       addData(priceFeed)
-
-
-
     })
   }, [])
 
@@ -264,5 +176,5 @@ export function RealTimeChart() {
 export default function RealTimeChartTest() {
 
 
-  return <RealTimeChart  />;
+  return <RealTimeChart />;
 }
