@@ -101,7 +101,7 @@ const apexOptions: ApexOptions = {
     },
   },
   yaxis: {
-    min: 0,
+    // min: 0,
     // max: 100,
     labels: {
       formatter: (val) => val.toFixed(2),
