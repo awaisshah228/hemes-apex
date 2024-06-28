@@ -43,10 +43,10 @@ const apexOptions: ApexOptions = {
     animations: {
       enabled: true,
       easing: 'linear',
-      dynamicAnimation: {
-        enabled: true,
-        speed: 1000,
-      },
+      // dynamicAnimation: {
+      //   enabled: true,
+      //   speed: 1000,
+      // },
     },
     toolbar: {
       show: true,
@@ -106,7 +106,7 @@ const apexOptions: ApexOptions = {
   },
   yaxis: {
     // min: 100,
-    max: 165,
+    // max: 165,
     labels: {
       formatter: (val) => val.toFixed(2),
     },
