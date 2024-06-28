@@ -37,7 +37,8 @@ const apexOptions: ApexOptions = {
     type: 'line',
     // height: 350,
     zoom: {
-      enabled: false,
+      enabled: true,
+      type:'xy'
     },
     animations: {
       enabled: true,
@@ -104,8 +105,8 @@ const apexOptions: ApexOptions = {
     },
   },
   yaxis: {
-    // min: 0,
-    // max: 100,
+    // min: 100,
+    max: 165,
     labels: {
       formatter: (val) => val.toFixed(2),
     },
