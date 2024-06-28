@@ -76,9 +76,9 @@ const apexOptions: ApexOptions = {
       highlightDataSeries: true
     }
   },
-  // dataLabels: {
-  //   enabled: true,
-  // },
+  dataLabels: {
+    enabled: true,
+  },
   stroke: {
     curve: 'straight',
     width: 1,
