@@ -81,7 +81,7 @@ const apexOptions: ApexOptions = {
     enabled: true,
   },
   stroke: {
-    curve: 'straight',
+    curve: 'smooth',
     width: 1,
   },
 
