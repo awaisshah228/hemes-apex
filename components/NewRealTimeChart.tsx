@@ -14,7 +14,23 @@ type Store = {
     append: (dataPoint: number[]) => void
 }
 
-const useDataStore = create<Store>()((set) => ({
+const usePriceDataStore = create<Store>()((set) => ({
+  data: [[Date.now()-10000, 145]],
+  append: (dataPoint: number[]) => set((state) => {
+    // only have the last 100 items in the list
+    return ({ data: [...state.data, dataPoint].slice(-100) })
+  }),
+}))
+
+const usePositiveConfidenceDataStore = create<Store>()((set) => ({
+  data: [[Date.now()-10000, 145]],
+  append: (dataPoint: number[]) => set((state) => {
+    // only have the last 100 items in the list
+    return ({ data: [...state.data, dataPoint].slice(-100) })
+  }),
+}))
+
+const useNegetiveConfidenceDataStore = create<Store>()((set) => ({
   data: [[Date.now()-10000, 145]],
   append: (dataPoint: number[]) => set((state) => {
     // only have the last 100 items in the list
@@ -132,14 +148,28 @@ export const NewRealTimeChart = () => {
     ];
     
     // const [data, setData] = useState([[Date.now(), getRandomInt(1, 10)]]);
-    const { data, append } = useDataStore()
+    const { data, append } = usePriceDataStore()
+    const { data: positivePrice, append: positiveAppend } = usePositiveConfidenceDataStore()
+    const { data: negetivePrice, append: negetiveAppend } = useNegetiveConfidenceDataStore()
     const [minMax, setMinMax] = useState({min: 0, max: 0});
 
     const ok: ApexCharts.ApexOptions = {
-        
-        series: [{
-            data: data
-        }],
+
+        series: [
+            {
+                name: 'price',
+                data: data
+            },
+            {
+                name: '+conf',
+                data: positivePrice
+            },
+            {
+                name: '-conf',
+                data: negetivePrice
+            },
+
+        ],
         chart: {
             id: 'realtime',
             height: '100vh',
@@ -183,6 +213,9 @@ export const NewRealTimeChart = () => {
             // max: 100
             min: minMax.min !== 0 ? minMax.min: undefined,
             max: minMax.max !== 0 ? minMax.max: undefined,
+            labels: {
+                show: true
+            }
 
         },
         legend: {
@@ -202,11 +235,15 @@ export const NewRealTimeChart = () => {
             // addData(priceFeed)
             // console.log('priceFeed.getPriceUnchecked().price :>> ', priceFeed.getPriceUnchecked().publishTime*1000);
             // console.log('priceFeed.getPriceUnchecked().price :>> ', priceFeed.getPriceUnchecked().getPriceAsNumberUnchecked());
-            const price = Number(priceFeed.getPriceUnchecked().getPriceAsNumberUnchecked().toFixed(5));
+            const price = priceFeed.getPriceUnchecked().getPriceAsNumberUnchecked();
+            const conf =priceFeed.getPriceUnchecked().getConfAsNumberUnchecked();
+            console.log('priceFeed.getPriceUnchecked().conf :>> ', priceFeed.getPriceUnchecked().getConfAsNumberUnchecked());
             let val = [priceFeed.getPriceUnchecked().publishTime * 1000, price]
             // console.log('data :>> ', useDataStore.getState().data);
            
             append(val);
+            positiveAppend([priceFeed.getPriceUnchecked().publishTime * 1000, price+conf])
+            negetiveAppend([priceFeed.getPriceUnchecked().publishTime * 1000, price-conf])
             // let array = [...data, val]
             // setData(array);
 
@@ -218,7 +255,7 @@ export const NewRealTimeChart = () => {
 
     useEffect(() => {
       setInterval(() => {
-        const latestPrice = useDataStore.getState().data[useDataStore.getState().data.length-1][1];
+        const latestPrice = usePriceDataStore.getState().data[usePriceDataStore.getState().data.length-1][1];
           console.log(' latestPrice * 0.99, :>> ', latestPrice + 1, latestPrice - 1);
         setMinMax({
             min: latestPrice - 0.4,
