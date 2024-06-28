@@ -34,7 +34,7 @@ const seriesCount = 530;
 
 const apexOptions: ApexOptions = {
   chart: {
-    type: 'area',
+    type: 'line',
     // height: 350,
     zoom: {
       enabled: false,
@@ -68,9 +68,12 @@ const apexOptions: ApexOptions = {
     ],
   },
   tooltip: {
-    enabled: true,
+    enabled: false,
     x:{
       show: true
+    },
+    onDatasetHover:{
+      highlightDataSeries: true
     }
   },
   dataLabels: {
