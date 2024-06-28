@@ -30,7 +30,7 @@ const pythPriceServiceConnection = new PriceServiceConnection(hermesUrl, {
 })
 
 
-const seriesCount = 120;
+const seriesCount = 530;
 
 const apexOptions: ApexOptions = {
   chart: {
