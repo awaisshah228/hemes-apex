@@ -93,7 +93,6 @@ const apexOptions: ApexOptions = {
 type TSeriesData = { x: number; y: number | null }[];
 type TSeries = { data: TSeriesData }[];
 
-
 export function RealTimeChart() {
   const [series, setSeries] = useState<TSeries>([]);
   const [options, setOptions] = useState<ApexOptions>(() => apexOptions);
