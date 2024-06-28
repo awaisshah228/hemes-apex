@@ -68,6 +68,7 @@ const apexOptions: ApexOptions = {
   stroke: {
     curve: 'smooth',
     width: 2,
+  
   },
   title: {
     text: 'Sol/USD Price',
