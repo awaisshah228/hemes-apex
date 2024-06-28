@@ -84,18 +84,18 @@ const apexOptions: ApexOptions = {
   },
   xaxis: {
     type: 'datetime',
+    min:new Date().getTime()-60000,
     labels: {
-      datetimeUTC: false,
-      formatter: function (val) {
-        return new Date(val).toLocaleTimeString('en-US', {
-          minute: '2-digit',
-          second: '2-digit',
-        });
-      },
-      datetimeFormatter: {
-        minute: 'HH:mm',
-        // hour:'HH'
-      },
+      // datetimeUTC: false,
+      // formatter: function (val) {
+      //   return new Date(val).toLocaleTimeString('en-US', {
+      //     minute: '2-digit',
+      //     second: '2-digit',
+      //   });
+      // },
+      // datetimeFormatter: {
+      //   minute: 'HH:mm',
+      // },
     },
   },
   yaxis: {
@@ -186,8 +186,9 @@ export function RealTimeChart() {
     },
     [options]
   );
+  const [data,setData]=useState<any[]>([])
 
-  const addData = useCallback(async (priceFeed: PriceFeed) => {
+  const addData = async (priceFeed: PriceFeed) => {
 
 
     try {
@@ -204,6 +205,21 @@ export function RealTimeChart() {
 
       const localDate = new Date(priceOracle.timestamp.toString() * 1000); // Convert seconds to milliseconds
 
+      const dataPt = {
+        x: Number(priceOracle.timestamp.toString()) * 1000,
+        y: Number(priceOracle.toUiPrice(2)),
+      };
+  
+      // Use functional update to ensure we work with the latest state
+      setData((prevData) => {
+        const newData = [...prevData, dataPt];
+        // Ensure the data array does not exceed 60 items
+        if (newData.length > 60) {
+          newData.shift(); // Remove the oldest item
+        }
+        return newData;
+      });
+
       // Format the date to a readable string
       const formattedDate = localDate.toLocaleString();
 
@@ -214,22 +230,14 @@ export function RealTimeChart() {
 
 
 
-      let locDt;
-      if(!series.length){
-        const seriesLoc:TSeries = await getInitialSeries()
-        locDt=seriesLoc[0]?.data
-      }else{
-        locDt= series[0]?.data
-      }
-      let dt = [...locDt];
-      // dt.forEach((x) => x.x--);
-      dt.push({ x: Number(priceOracle.timestamp.toString()) * 1000, y: Number(priceOracle.toUiPrice(2)) });
-      // 차트 포인트 없애기 위해 조기화
-      //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
-      //dt[0].y = 0;
-      // console.log(dt.length);
-
-      setSeries([{ data: [...dt] }]);
+      setSeries((prevSeries) => {
+        const newData = [...(prevSeries[0]?.data || []), dataPt];
+        // Ensure the series data array does not exceed 60 items
+        if (newData.length > 60) {
+          newData.shift(); // Remove the oldest item
+        }
+        return [{ data: newData }];
+      });
 
 
 
@@ -237,12 +245,10 @@ export function RealTimeChart() {
 
       // Check if the timestamp already exists
 
-      console.log(series)
 
       // 차트 포인트 없애기 위해 조기화
       //이걸 넣으니 시리즈 slice시 챠트 새로고침 현상 발생하여 삭제
       //dt[0].y = 0;
-      console.log(dt.length);
 
 
     } catch (error) {
@@ -252,7 +258,7 @@ export function RealTimeChart() {
     // const priceUpdates = await pythPriceServiceConnection.getLatestPriceFeeds(priceIds);
     // const priceFeed: PriceFeed = priceUpdates[0]
 
-  }, [series]);
+  };
 
   // useEffect(() => {
   //   const timer = setInterval(() => {
