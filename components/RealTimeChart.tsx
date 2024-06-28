@@ -81,7 +81,9 @@ const apexOptions: ApexOptions = {
       formatter: (val) => val.toFixed(2),
     },
     title: { text: 'Sol/USD ' },
-    stepSize:1
+    stepSize:1,
+    min:0,
+    max:5
   },
   legend: {
     horizontalAlign: 'left',
@@ -130,16 +132,22 @@ export function RealTimeChart() {
         const maxPrice = Math.max(...prices);
         // const yAxisMin = minPrice - (minPrice * 0.01);
         // const yAxisMax = maxPrice + (maxPrice * 0.01);
-        const yAxisMin = Math.floor(minPrice-0.5)
-        const yAxisMax = Math.ceil(maxPrice+0.5) 
+        const yAxisMin = Math.floor(minPrice-1)
+        const yAxisMax = Math.ceil(maxPrice+1) 
 
 
 
 
         setOptions((prevOptions) => {
-          if (prevOptions.yaxis?.min === yAxisMin && prevOptions.yaxis?.max == yAxisMax) {
+          //@ts-ignore
+          const prevYAxisMin = prevOptions.yaxis?.min ?? Number.POSITIVE_INFINITY;
+           //@ts-ignore
+          const prevYAxisMax = prevOptions.yaxis!.max ?? Number.NEGATIVE_INFINITY;
+        
+          if (prevYAxisMin === yAxisMin && prevYAxisMax === yAxisMax) {
             return prevOptions;
           }
+         
 
           return {
             ...prevOptions,
