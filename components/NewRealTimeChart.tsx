@@ -16,7 +16,10 @@ type Store = {
 
 const useDataStore = create<Store>()((set) => ({
   data: [[Date.now()-10000, 145]],
-  append: (dataPoint: number[]) => set((state) => ({ data: [...state.data, dataPoint] })),
+  append: (dataPoint: number[]) => set((state) => {
+    // only have the last 100 items in the list
+    return ({ data: [...state.data, dataPoint].slice(-100) })
+  }),
 }))
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -143,7 +146,7 @@ export const NewRealTimeChart = () => {
             width: '100vw',
             type: 'line',
             animations: {
-                enabled: true,
+                enabled: false,
                 easing: 'linear',
                 dynamicAnimation: {
                     speed: 100
@@ -218,8 +221,8 @@ export const NewRealTimeChart = () => {
         const latestPrice = useDataStore.getState().data[useDataStore.getState().data.length-1][1];
           console.log(' latestPrice * 0.99, :>> ', latestPrice + 1, latestPrice - 1);
         setMinMax({
-            min: latestPrice - 0.5,
-            max: latestPrice + 0.5,
+            min: latestPrice - 0.4,
+            max: latestPrice + 0.4,
         })
       }, 5000);
     
