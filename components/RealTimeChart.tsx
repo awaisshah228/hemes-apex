@@ -143,10 +143,7 @@ export function RealTimeChart() {
         y: Number(priceOracle.toUiPrice(2)),
       };
 
-      const formattedDate = localDate.toLocaleString();
-      console.log(priceOracle.toUiPrice(2));
-      console.log(priceOracle.timestamp.toString())
-      console.log(`Timestamp (local date): ${formattedDate}`);
+     
       setSeries((prevSeries) => {
         const newData = [...(prevSeries[0]?.data || []), dataPt];
         // Ensure the series data array does not exceed 60 items
