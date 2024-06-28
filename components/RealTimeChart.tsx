@@ -30,7 +30,7 @@ const pythPriceServiceConnection = new PriceServiceConnection(hermesUrl, {
 })
 
 
-const seriesCount = 60;
+const seriesCount = 120;
 
 const apexOptions: ApexOptions = {
   chart: {
@@ -160,32 +160,12 @@ export function RealTimeChart() {
   const [series, setSeries] = useState<TSeries>([]);
   //const [series, setSeries] = useState<TSeries>([{ name: 'test', data: [] }]);
   const [options, setOptions] = useState<ApexOptions>(() => apexOptions);
-  const needAdd = useRef(false);
-  const needSlice = useRef(false);
+ 
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const data = await getInitialSeries()
-  //     setSeries(data)
+ 
 
-  //   }
-  //   )()
-  // }, [])
-
-  const setAnimation = useCallback<(value: boolean) => void>(
-    (value) => {
-      const newOption = {
-        ...options,
-        chart: {
-          ...options.chart,
-          animations: { ...options.chart?.animations, enabled: value },
-        },
-      };
-      setOptions(newOption);
-    },
-    [options]
-  );
-  const [data,setData]=useState<any[]>([])
+ 
+  // const [data,setData]=useState<any[]>([])
 
   const addData = async (priceFeed: PriceFeed) => {
 
@@ -210,14 +190,14 @@ export function RealTimeChart() {
       };
   
       // Use functional update to ensure we work with the latest state
-      setData((prevData) => {
-        const newData = [...prevData, dataPt];
-        // Ensure the data array does not exceed 60 items
-        if (newData.length > 60) {
-          newData.shift(); // Remove the oldest item
-        }
-        return newData;
-      });
+      // setData((prevData) => {
+      //   const newData = [...prevData, dataPt];
+      //   // Ensure the data array does not exceed 60 items
+      //   if (newData.length > seriesCount) {
+      //     newData.shift(); // Remove the oldest item
+      //   }
+      //   return newData;
+      // });
 
       // Format the date to a readable string
       const formattedDate = localDate.toLocaleString();
@@ -232,7 +212,7 @@ export function RealTimeChart() {
       setSeries((prevSeries) => {
         const newData = [...(prevSeries[0]?.data || []), dataPt];
         // Ensure the series data array does not exceed 60 items
-        if (newData.length > 60) {
+        if (newData.length > seriesCount) {
           newData.shift(); // Remove the oldest item
         }
         return [{ data: newData }];
@@ -259,45 +239,9 @@ export function RealTimeChart() {
 
   };
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     const len = series[0]?.data.length ?? 0 // ;
-  //     if (len > seriesCount * 2) {
+  
 
-  //       //1
-  //       // The data to be added this time will be added after the data has been cut. -> 4 times
-  //       needSlice.current = true;
-  //       setAnimation(false);
-  //     }
-  //   }, 1000);
-
-  //   return () => clearInterval(timer);
-  // }, [addData, series, setAnimation]);
-
-  // useEffect(() => {
-  //   const aniEnable = options.chart?.animations?.enabled;
-
-  //   if (!aniEnable) {
-  //     if (needSlice.current) {
-  //       needSlice.current = false;
-
-  //       let dt = [...series[0].data];
-  //       // 2. The data is cut when the animation is stopped.
-  //       dt = dt.slice(seriesCount, dt.length);
-  //       const newSeries = { ...series[0], data: dt };
-  //       setSeries([newSeries]);
-  //     } else {
-  //       //  3. After the animation was stopped, the data was cut and updated with the series.
-  //       // Set the flag to replay the animation again and save the previously unsaved data
-  //       needAdd.current = true;
-  //       setAnimation(true);
-  //     }
-  //   } else {
-  //     //// 4. Add the data that you didn't want to add to the series.
-
-
-  //   }
-  // }, [addData, options.chart?.animations?.enabled, series, setAnimation]);
+ 
 
   useEffect(() => {
 
