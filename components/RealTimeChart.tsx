@@ -67,18 +67,18 @@ const apexOptions: ApexOptions = {
       },
     ],
   },
-  // tooltip: {
-  //   enabled: false,
-  //   // x:{
-  //   //   show: true
-  //   // },
-  //   onDatasetHover:{
-  //     highlightDataSeries: true
-  //   }
-  // },
-  dataLabels: {
+  tooltip: {
     enabled: true,
+    // x:{
+    //   show: true
+    // },
+    onDatasetHover:{
+      highlightDataSeries: true
+    }
   },
+  // dataLabels: {
+  //   enabled: true,
+  // },
   stroke: {
     curve: 'straight',
     width: 1,
